@@ -103,7 +103,7 @@ def main():
         """
     **Welcome to the OpenAI Fact-checking Widget!**
 
-    This app uses OpenAI's large language models to generate fact-checks, following a method similar to the one described in the article [*Fact-checking information from large language models can decrease headline discernment*](https://doi.org/10.1073/pnas.2322823121) by DeVerna et al. (2024)—published in the *Proceedings of the National Academy of Sciences U.S.A.*.
+    This app uses OpenAI's large language models to generate fact-checks, following a method similar to the one described in the article [*Fact-checking information from large language models can decrease headline discernment*](https://doi.org/10.1073/pnas.2322823121) by DeVerna et al. (2024)—published in the *Proceedings of the National Academy of Sciences USA*.
 
     To get started, enter your OpenAI API key below.
     """
