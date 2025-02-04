@@ -210,7 +210,7 @@ def main():
         )
 
         article_title = st.text_input(
-            "**Enter an Article Headline** to fact check and press enter on your keyboard.",
+            "**Enter an Article Headline** to fact check and press enter on your keyboard. Then click the 'Fact check' button.",
             key="article_title",
         )
 
