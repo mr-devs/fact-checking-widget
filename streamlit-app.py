@@ -204,7 +204,7 @@ def main():
         st.subheader("Fact check an article")
 
         st.info(
-            "*Note**: "
+            "**Note**: "
             "In [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
             "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
         )
