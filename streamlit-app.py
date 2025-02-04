@@ -21,9 +21,11 @@ from openai import OpenAI
 # Ref: https://beta.openai.com/docs/api-reference/models/list
 MODEL_MAP = {
     "GPT-3.5 Turbo": "gpt-3.5-turbo",
-    "GPT-4 Turbo": "gpt-4-turbo",
-    "GPT-4o mini": "gpt-4o-mini",
-    "GPT-4o": "chatgpt-4o-latest",
+    "GPT-4o": "gpt-4o",
+    "ChatGPT-4o (Latest used in ChatGPT)": "chatgpt-4o-latest",
+    "GPT-4o Mini": "gpt-4o-mini",
+    "o1": "o1",
+    "o1 Mini": "o1-mini",
 }
 
 
