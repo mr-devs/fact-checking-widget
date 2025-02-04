@@ -154,7 +154,7 @@ def main():
         st.markdown(
             """
         #### Steps
-        1. **Select a Model** from the dropdown menu below.
+        1. **Select an OpenAI model** from the dropdown menu below.
         2. **Enter an Article Headline** in the "Fact-check an article" section and click "Fact check".
         """
         )
@@ -166,7 +166,7 @@ def main():
     # Model selection
     st.subheader("Select a Model")
     selected_model = st.selectbox(
-        "Choose an OpenAI model for fact-checking",
+        "**Select an OpenAI model** to use for fact-checking",
         options=list(MODEL_MAP.keys()),
         index=0,
     )
