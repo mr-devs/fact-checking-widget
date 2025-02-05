@@ -205,7 +205,7 @@ def main():
                 for i, article in enumerate(sampled_articles):
                     st.markdown(
                         f"**{i+1}. {article['title']}** "
-                        f"{article['published_date']}); ([source]({article['href']})"
+                        f"{article['published_date']}); ([source]({article['href']}))"
                     )
                 st.info(
                     "**Note**: Given the 'breaking news problem' discussed by [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121)"
