@@ -176,6 +176,21 @@ def main():
     # Get the corresponding model ID
     model_id = MODEL_MAP[selected_model]
 
+    # Temperature slider
+    st.subheader("Adjust Model Temperature")
+    temperature = st.slider(
+        "Select the temperature for the model (controls the randomness of the output)",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.3,
+        step=0.1,
+        help=(
+            "Temperature controls the randomness of the output. "
+            "Lower values make the output more focused and deterministic, while higher values make it more random."
+            "Value from DeVerna et al. (2024) was 0.0."
+        ),
+    )
+
     # Retrieve recent articles
     st.subheader("Fetch recent articles from Google News (optional)")
     if st.button("Fetch"):
@@ -205,15 +220,19 @@ def main():
     with input_container:
         st.subheader("Fact check an article")
 
-        st.info(
-            "**Note**: "
-            "In [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
-            "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
-        )
+        # st.info(
+        #     "**Note**: "
+        #     "In [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
+        #     "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
+        # )
 
         article_title = st.text_input(
             "**Enter an Article Headline** to fact check and press enter on your keyboard. Then click the 'Fact check' button.",
             key="article_title",
+            help=(
+                "In DeVerna et al. (2024), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
+                "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
+            ),
         )
 
         if st.button("Fact check"):
@@ -227,18 +246,30 @@ def main():
                         f"I saw something today that claimed {article_title}. "
                         "Do you think that this is likely to be true?"
                     )
-                    st.info(f"Prompt: {prompt}\n\n" f"Model: {selected_model}")
+                    st.info(f"**Prompt**: {prompt}\n\n" f"**Model**: {selected_model}")
 
-                    response = client.chat.completions.create(
-                        model=model_id,
-                        messages=[
-                            {"role": "user", "content": prompt},
-                        ],
-                    )
+                    if model_id in ["o1", "o1-mini"]:
+                        st.warning(
+                            "The 'o1' and 'o1-mini' models do not support the 'temperature' parameter, so it will be ignored."
+                        )
+                        response = client.chat.completions.create(
+                            model=model_id,
+                            messages=[
+                                {"role": "user", "content": prompt},
+                            ],
+                        )
+                    else:
+                        response = client.chat.completions.create(
+                            model=model_id,
+                            messages=[
+                                {"role": "user", "content": prompt},
+                            ],
+                            temperature=temperature,  # Use the selected temperature
+                        )
 
                     fact_check_result = response.choices[0].message.content
 
-            st.subheader("Fact-checking Result:")
+            st.subheader("Fact-checking Result")
             st.write(fact_check_result)
 
 
