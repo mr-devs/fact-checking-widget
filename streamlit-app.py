@@ -98,14 +98,14 @@ def main():
     Main function to run the Streamlit app.
     """
     global client
-    st.title("OpenAI Fact-checking Widget")
+    st.title("Fact-checking Widget")
 
     # Add app description
     st.markdown(
         """
-    **Welcome to the OpenAI Fact-checking Widget!**
+    **Welcome to the fact-checking widget!**
 
-    This app uses OpenAI's large language models to generate fact-checks, following a method similar to the one described in the article [*Fact-checking information from large language models can decrease headline discernment*](https://doi.org/10.1073/pnas.2322823121) by DeVerna et al. (2024)—published in the *Proceedings of the National Academy of Sciences USA*.
+    This app leverages OpenAI's large language models to generate fact-checks, following a methodology similar to that described in [*Fact-checking information from large language models can decrease headline discernment*](https://doi.org/10.1073/pnas.2322823121) by DeVerna et al. (2024), published in the *Proceedings of the National Academy of Sciences (PNAS)*.
 
     To get started, enter your OpenAI API key below.
     """
@@ -146,53 +146,47 @@ def main():
         st.session_state.api_key_valid = False
         return
 
-    # Create container for instructions
-    instructions_container = st.container()
-
-    with instructions_container:
-
-        # Create container for input options
-        st.subheader("How to use the Fact-checking Widget")
-        st.markdown(
-            """
-        #### Steps
-        1. **Select an OpenAI model** from the dropdown menu below.
-        2. **Enter an Article Headline** in the "Fact-check an article" section and click "Fact check".
-        """
-        )
-        st.info(
-            "**Note**: You can enter any headline: real, fake, or complete nonsense. "
-            "Of course, results will vary accordingly."
-        )
-
-    # Model selection
-    st.subheader("Select a Model")
-    selected_model = st.selectbox(
-        "**Select an OpenAI model** to use for fact-checking",
-        options=list(MODEL_MAP.keys()),
-        index=0,
+    # Model selection and temperature slider side by side
+    st.subheader("1. Model specification")
+    st.markdown(
+        "Select an OpenAI model from the dropdown to use for fact-checking and adjust the temperature."
     )
 
-    # Get the corresponding model ID
-    model_id = MODEL_MAP[selected_model]
+    col1, col2 = st.columns(2)
 
-    # Temperature slider
-    st.subheader("Adjust Model Temperature")
-    temperature = st.slider(
-        "Select the temperature for the model (controls the randomness of the output)",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.3,
-        step=0.1,
-        help=(
-            "Temperature controls the randomness of the output. "
-            "Lower values make the output more focused and deterministic, while higher values make it more random."
-            "Value from DeVerna et al. (2024) was 0.0."
-        ),
-    )
+    with col1:
+        selected_model = st.selectbox(
+            "**Select a model**",
+            options=list(MODEL_MAP.keys()),
+            index=0,
+            help=(
+                "Different models have different capabilities and performance. "
+                "Learn more about them [here](https://platform.openai.com/docs/models). "
+                "In DeVerna et al (2024), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo."
+            ),
+        )
+        model_id = MODEL_MAP[selected_model]
+
+    with col2:
+        temperature = st.slider(
+            "**Set temperature**",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.3,
+            step=0.1,
+            help=(
+                "Temperature controls the randomness of the model's output. "
+                "Lower values make the output more focused and deterministic, while higher values make it more random. "
+                "The value used in DeVerna et al. (2024) was 0.0."
+            ),
+        )
 
     # Retrieve recent articles
-    st.subheader("Fetch recent articles from Google News (optional)")
+    st.divider()
+    st.markdown(
+        "##### Fetch recent headlines",
+        help="Optional: Gather recent articles from Google News to use as examples for fact-checking. ",
+    )
     if st.button("Fetch"):
         with st.spinner("Fetching recent articles..."):
             articles = get_recent_articles()
@@ -202,11 +196,13 @@ def main():
                 st.success(
                     "Recent articles retrieved successfully! Click the 'Fetch' button again to change the articles."
                 )
-                for i, article in enumerate(sampled_articles):
-                    st.markdown(
-                        f"**{i+1}. {article['title']}** "
-                        f"{article['published_date']}); ([source]({article['href']}))"
-                    )
+                articles_container = st.container()
+                with articles_container:
+                    for i, article in enumerate(sampled_articles):
+                        st.markdown(
+                            f"**{i+1}. {article['title']}** "
+                            f"({article['published_date']}; [source]({article['href']}))"
+                        )
                 st.info(
                     "**Note**: Given the 'breaking news problem' discussed by [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121)"
                     "—*'Developing news stories often discuss novel events the model has never been exposed to, making it difficult for AI to assess them accurately'*—"
@@ -218,20 +214,20 @@ def main():
 
     input_container = st.container()
     with input_container:
-        st.subheader("Fact check an article")
+        st.divider()
+        st.subheader("2. Fact check an article")
 
-        # st.info(
-        #     "**Note**: "
-        #     "In [DeVerna et al. (2024)](https://doi.org/10.1073/pnas.2322823121), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
-        #     "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
-        # )
+        st.markdown(
+            "Enter the headline of an article to fact check. "
+            "It can be real, fake, or complete nonsense."
+        )
 
         article_title = st.text_input(
-            "**Enter an Article Headline** to fact check and press enter on your keyboard. Then click the 'Fact check' button.",
+            "**Article Headline**",
             key="article_title",
             help=(
                 "In DeVerna et al. (2024), the authors entered headlines directly into the OpenAI website, which at the time was using GPT-3.5 Turbo. "
-                "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, our results are likely to differ from those reported in the publication."
+                "Since this widget (1) uses the API and (2) cannot account for updates OpenAI may have made to the model over time, these results are likely to differ from those reported in the publication."
             ),
         )
 
@@ -246,7 +242,14 @@ def main():
                         f"I saw something today that claimed {article_title}. "
                         "Do you think that this is likely to be true?"
                     )
-                    st.info(f"**Prompt**: {prompt}\n\n" f"**Model**: {selected_model}")
+                    temp_str = (
+                        temperature if model_id not in ["o1", "o1-mini"] else "n/a"
+                    )
+                    st.info(
+                        f"**Prompt**: {prompt}\n\n"
+                        f"**Model**: {selected_model}\n\n "
+                        f"**Temperature**: {temp_str}"
+                    )
 
                     if model_id in ["o1", "o1-mini"]:
                         st.warning(
